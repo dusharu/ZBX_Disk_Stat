@@ -32,7 +32,7 @@ systemctl restart zabbix-agent
 # Gentoo
 /etc/init.d/zabbix-agentd restart
 ```
-  2. Import Template
+  2. [Import](https://www.zabbix.com/documentation/3.4/manual/xml_export_import/templates) [Template_ZBX/ZBX_Disk_Stat.xml](Template_ZBX/ZBX_Disk_Stat.xml)
   3. Check [global regexp](https://www.zabbix.com/documentation/3.4/manual/regular_expressions): block_dev_filter
      * ^$ - result FALSE - device was remove while 
      * .*snapshot.* - result FALSE - filter LVM snapshot
