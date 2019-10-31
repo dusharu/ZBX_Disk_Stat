@@ -46,10 +46,11 @@ systemctl restart zabbix-agent
 
 
 # Screenshoot
+Graph create by [Grafana](https://grafana.com/) and [Zabbix plugin](https://grafana.com/grafana/plugins/alexanderzobnin-zabbix-app)
 ![1-Disk_Stat_IOPS.png](/Screenshoots/1-Disk_Stat_IOPS.png)
 ![2-Disk_Stat_RW_Sectors.png](/Screenshoots/2-Disk_Stat_RW_Sectors.png)
 ![3-Disk_Stat_IO_time.png](/Screenshoots/3-Disk_Stat_IO_time.png)
-![3-Disk_Stat_IO_time.png](/Screenshoots/3-Disk_Stat_IO_time.png)
+![4-Disk_Stat_IO_Queue.png](/Screenshoots/4-Disk_Stat_IO_Queue.png)
 
 
 # Debug Command
