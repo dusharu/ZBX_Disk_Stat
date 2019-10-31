@@ -1,6 +1,7 @@
 # ZBX_Disk_Stat
 Send statistic from /proc/diskstats to Zabbix without any additional package and program
-Small Project for Home_Server
+
+This is small project for my Home server
 
 # Features
   * AutoDiscovery BlockDev and Filter by [global regexp](https://www.zabbix.com/documentation/3.4/manual/regular_expressions): block_dev_filter 
@@ -13,17 +14,6 @@ Small Project for Home_Server
 
 # Install
   1. Add parametrs to zabbix-agent.conf
-  2. Import Template
-  3. Check [global regexp](https://www.zabbix.com/documentation/3.4/manual/regular_expressions): block_dev_filter
-    * ^$ - result FALSE - device was remove while 
-    * .*snapshot.* - result FALSE - filter LVM snapshot
-    * -real$ - result FALSE - [filter LVM snapshot](https://rwmj.wordpress.com/2010/09/28/how-lvm-does-snapshots/)
-    * -cow$ - result FALSE - [filter LVM snapshot](https://rwmj.wordpress.com/2010/09/28/how-lvm-does-snapshots/)
-    * ^xvd[a-z]*[0-9]+$ - result FALSE - filter partitions
-    * ^[hs]d[a-z]*[0-9]+$ - result FALSE - filter partitions
-    * ^loop[0-9]*$ - result FALSE - filter loop device
-  4. Add host to group "Disk_Stat: io_block_dev"
-  5. Wait before Zabbix Discovery and Get Some Data
 
 ```
 #### enable Include in config
@@ -42,8 +32,25 @@ systemctl restart zabbix-agent
 # Gentoo
 /etc/init.d/zabbix-agentd restart
 ```
+  2. Import Template
+  3. Check [global regexp](https://www.zabbix.com/documentation/3.4/manual/regular_expressions): block_dev_filter
+     * ^$ - result FALSE - device was remove while 
+     * .*snapshot.* - result FALSE - filter LVM snapshot
+     * -real$ - result FALSE - [filter LVM snapshot](https://rwmj.wordpress.com/2010/09/28/how-lvm-does-snapshots/)
+     * -cow$ - result FALSE - [filter LVM snapshot](https://rwmj.wordpress.com/2010/09/28/how-lvm-does-snapshots/)
+     * ^xvd[a-z]*[0-9]+$ - result FALSE - filter partitions
+     * ^[hs]d[a-z]*[0-9]+$ - result FALSE - filter partitions
+     * ^loop[0-9]*$ - result FALSE - filter loop device
+  4. Add host to group "Disk_Stat: io_block_dev"
+  5. Wait before Zabbix Discovery and Get Some Data
+
 
 # Screenshoot
+![1-Disk_Stat_IOPS.png](/Screenshoots/1-Disk_Stat_IOPS.png)
+![2-Disk_Stat_RW_Sectors.png](/Screenshoots/2-Disk_Stat_RW_Sectors.png)
+![3-Disk_Stat_IO_time.png](/Screenshoots/3-Disk_Stat_IO_time.png)
+![3-Disk_Stat_IO_time.png](/Screenshoots/3-Disk_Stat_IO_time.png)
+
 
 # Debug Command
 ## Test Discovery
@@ -57,8 +64,10 @@ zabbix_get -s 192.168.1.200 -k custom.blkdev.all_stat[vg00-lv_root] | jq .
 # Docs
   1. [kernel.org: Describe /proc/diskstats](https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats)
   2. [kernel.org: I/O statistics fields](https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst)
+  3. [Wikipedia.org: maximum IOPS on different Disk](https://en.wikipedia.org/wiki/IOPS)
+  4. [RAID calcuator](https://wintelguy.com/raidperf.pl)
 
 # ToDo
   1. Add trigers
   2. Add Graphs to Zabbix
-  3. Add Some Theory to README
+
