@@ -34,7 +34,7 @@ systemctl restart zabbix-agent
 /etc/init.d/zabbix-agentd restart
 ```
   2. [Import](https://www.zabbix.com/documentation/3.4/manual/xml_export_import/templates) [Template_ZBX/ZBX_Disk_Stat.xml](Template_ZBX/ZBX_Disk_Stat.xml)
-  3. Check [global regexp](https://www.zabbix.com/documentation/3.4/manual/regular_expressions): block_dev_filter
+  3. Create [global regexp](https://www.zabbix.com/documentation/3.4/manual/regular_expressions): block_dev_filter
      * ^$ - result FALSE - device was remove while 
      * .*snapshot.* - result FALSE - filter LVM snapshot
      * -real$ - result FALSE - [filter LVM snapshot](https://rwmj.wordpress.com/2010/09/28/how-lvm-does-snapshots/)
@@ -53,6 +53,13 @@ Graph create by [Grafana](https://grafana.com/) and [Zabbix plugin](https://graf
 ![3-Disk_Stat_IO_time.png](/Screenshoots/3-Disk_Stat_IO_time.png)
 ![4-Disk_Stat_IO_Queue.png](/Screenshoots/4-Disk_Stat_IO_Queue.png)
 
+# Files
+  * config_zabbix-agent - config fot zabbix Agent
+  * Develop - information for Developers
+  * Screenshoots - Screensoot for README.md
+  * Template_ZBX - template for import to ZBX
+  * README.md - information for Users
+  * LICENSE - license file
 
 # Debug Command
 ## Test Discovery
