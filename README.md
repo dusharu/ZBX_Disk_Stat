@@ -22,7 +22,8 @@ echo "Include=/etc/zabbix-agent.d/*.conf" >> /etc/zabbix/zabbix_agentd.conf
 
 #### copy config 
 mkdir -p /etc/zabbix-agent.d/ && cd /etc/zabbix-agent.d/
-curl -O 'https://github.com/dusharu/ZBX_Disk_Stat/blob/master/config_zabbix-agent/Disk_Stat.conf'
+curl -O 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/config_zabbix-agent/Disk_Stat.conf'
+
 
 #### restart zabbix-agent
 # RHEL/CentOS
