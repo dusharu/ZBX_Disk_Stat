@@ -54,11 +54,11 @@ Graph create by [Grafana](https://grafana.com/) and [Zabbix plugin](https://graf
 ![4-Disk_Stat_IO_Queue.png](/Screenshoots/4-Disk_Stat_IO_Queue.png)
 
 # Files
-  * config_zabbix-agent - config fot zabbix Agent
+  * config_zabbix-agent - config for zabbix Agent
+  * Template_ZBX - Zabbix Template
   * Develop - information for Developers
-  * Screenshoots - Screensoot for README.md
-  * Template_ZBX - template for import to ZBX
   * README.md - information for Users
+  * Screenshoots - Screensoot for README.md
   * LICENSE - license file
 
 # Debug Command
