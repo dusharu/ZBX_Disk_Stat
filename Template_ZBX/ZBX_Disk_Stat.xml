@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>3.4</version>
-    <date>2019-10-31T22:09:02Z</date>
+    <date>2019-11-03T03:02:31Z</date>
     <groups>
         <group>
             <name>io_block_dev</name>
@@ -124,7 +124,7 @@ Describe in https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst</de
                             <history>30d</history>
                             <trends>365d</trends>
                             <status>0</status>
-                            <value_type>0</value_type>
+                            <value_type>3</value_type>
                             <allowed_hosts/>
                             <units/>
                             <snmpv3_contextname/>
