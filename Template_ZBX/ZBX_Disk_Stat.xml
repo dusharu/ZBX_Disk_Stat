@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>3.4</version>
-    <date>2019-11-04T01:08:47Z</date>
+    <date>2019-11-04T21:49:27Z</date>
     <groups>
         <group>
             <name>io_block_dev</name>
@@ -374,7 +374,7 @@ This is the total number of sectors read successfully  divided by total second.<
                             </master_item_prototype>
                         </item_prototype>
                         <item_prototype>
-                            <name>Read_time_per_min on $1</name>
+                            <name>The total number of milliseconds spent by all reads on $1</name>
                             <type>18</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -634,7 +634,7 @@ This is the total number of sectors written successfully divided by total second
                             </master_item_prototype>
                         </item_prototype>
                         <item_prototype>
-                            <name>Write_time_per_min on $1</name>
+                            <name>The total number of milliseconds spent by all writes on $1</name>
                             <type>18</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -688,7 +688,48 @@ This is the total number of milliseconds spent by all writes (as measured from _
                             </master_item_prototype>
                         </item_prototype>
                     </item_prototypes>
-                    <trigger_prototypes/>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{io_block_dev:custom.blkdev.read_io_time[{#DEVBLK}].min(5m)}&gt;30</expression>
+                            <recovery_mode>0</recovery_mode>
+                            <recovery_expression/>
+                            <name>Read_IO_time on {#DEVBLK} is critically big</name>
+                            <correlation_mode>0</correlation_mode>
+                            <correlation_tag/>
+                            <url/>
+                            <status>0</status>
+                            <priority>3</priority>
+                            <description>&lt;10ms - OK&#13;
+&gt;10ms - BAD for DB disk&#13;
+&gt;30ms - BAD for typical Disk usage&#13;
+&#13;
+Not use this metric for Backup Disk</description>
+                            <type>0</type>
+                            <manual_close>0</manual_close>
+                            <dependencies/>
+                            <tags/>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{io_block_dev:custom.blkdev.write_io_time[{#DEVBLK}].min(5m)}&gt;30</expression>
+                            <recovery_mode>0</recovery_mode>
+                            <recovery_expression/>
+                            <name>Write_IO_time on {#DEVBLK} is critically big</name>
+                            <correlation_mode>0</correlation_mode>
+                            <correlation_tag/>
+                            <url/>
+                            <status>0</status>
+                            <priority>3</priority>
+                            <description>&lt;10ms - OK&#13;
+&gt;10ms - BAD for DB disk&#13;
+&gt;30ms - BAD for typical Disk usage&#13;
+&#13;
+Not use this metric for Backup Disk</description>
+                            <type>0</type>
+                            <manual_close>0</manual_close>
+                            <dependencies/>
+                            <tags/>
+                        </trigger_prototype>
+                    </trigger_prototypes>
                     <graph_prototypes/>
                     <host_prototypes/>
                     <jmx_endpoint/>
