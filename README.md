@@ -78,5 +78,4 @@ zabbix_get -s 192.168.1.200 -k custom.blkdev.all_stat[vg00-lv_root] | jq .
   4. [RAID calcuator](https://wintelguy.com/raidperf.pl)
 
 # ToDo
-  1. Add Graphs to Zabbix
-
+  1. Add link with information about maximum IO_time
