@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>3.4</version>
-    <date>2019-11-12T23:20:02Z</date>
+    <date>2019-11-12T23:25:19Z</date>
     <groups>
         <group>
             <name>io_block_dev</name>

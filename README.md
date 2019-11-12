@@ -8,6 +8,7 @@ This is small project for my Home server
   * Collect Read\Write Operations per second
   * Collect Read\Write Sectors per second
   * Calculate Time for 1 Read\Write Operations
+    * Trigger when IO_Time >30ms at last 5min
   * Collect IO Queue
   * Convert DM(Device Mapper) device to Human Name
     * dm-1 -> vg00-lv_root
@@ -77,6 +78,4 @@ zabbix_get -s 192.168.1.200 -k custom.blkdev.all_stat[vg00-lv_root] | jq .
   4. [RAID calcuator](https://wintelguy.com/raidperf.pl)
 
 # ToDo
-  1. Add trigers
-  2. Add Graphs to Zabbix
-
+  1. Add link with information about maximum IO_time
