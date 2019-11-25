@@ -70,7 +70,7 @@ zabbix_get -s <IP|Server_Name> -k custom.blkdev.discovery |jq .
 ```
 ## Get statistic
 ```
-zabbix_get -s 192.168.1.200 -k custom.blkdev.all_stat[vg00-lv_root] | jq .
+zabbix_get -s <IP|Server_Name> -k custom.blkdev.all_stat[vg00-lv_root] | jq .
 ```
 # Docs
   1. [kernel.org: Describe /proc/diskstats](https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats)
