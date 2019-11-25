@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>3.4</version>
-    <date>2019-11-05T08:40:41Z</date>
+    <date>2019-11-12T23:25:19Z</date>
     <groups>
         <group>
             <name>io_block_dev</name>
@@ -156,7 +156,7 @@ The only field that should go to zero. Incremented as requests are given to appr
                             <preprocessing>
                                 <step>
                                     <type>12</type>
-                                    <params>$.IO_Queue</params>
+                                    <params>$['ZBX_Disk_Stat'][0]['io_queue']</params>
                                 </step>
                             </preprocessing>
                             <jmx_endpoint/>
@@ -250,7 +250,7 @@ This is the total number of reads completed successfully.</description>
                             <preprocessing>
                                 <step>
                                     <type>12</type>
-                                    <params>$.Read_Operation</params>
+                                    <params>$['ZBX_Disk_Stat'][0]['read_complete']</params>
                                 </step>
                                 <step>
                                     <type>9</type>
@@ -305,7 +305,7 @@ This is the total number of reads completed successfully divided by total second
                             <preprocessing>
                                 <step>
                                     <type>12</type>
-                                    <params>$.Read_Operation</params>
+                                    <params>$['ZBX_Disk_Stat'][0]['read_complete']</params>
                                 </step>
                                 <step>
                                     <type>10</type>
@@ -360,7 +360,7 @@ This is the total number of sectors read successfully  divided by total second.<
                             <preprocessing>
                                 <step>
                                     <type>12</type>
-                                    <params>$.Read_sector</params>
+                                    <params>$['ZBX_Disk_Stat'][0]['read_sector']</params>
                                 </step>
                                 <step>
                                     <type>10</type>
@@ -415,7 +415,7 @@ This is the total number of milliseconds spent by all reads (as measured from __
                             <preprocessing>
                                 <step>
                                     <type>12</type>
-                                    <params>$.Read_time</params>
+                                    <params>$['ZBX_Disk_Stat'][0]['read_time']</params>
                                 </step>
                                 <step>
                                     <type>9</type>
@@ -512,7 +512,7 @@ This is the total number of writes completed successfully.</description>
                             <preprocessing>
                                 <step>
                                     <type>12</type>
-                                    <params>$.Write_Operation</params>
+                                    <params>$['ZBX_Disk_Stat'][0]['write_complete']</params>
                                 </step>
                                 <step>
                                     <type>9</type>
@@ -566,7 +566,7 @@ This is the total number of writes completed successfully divided by total secon
                             <preprocessing>
                                 <step>
                                     <type>12</type>
-                                    <params>$.Write_Operation</params>
+                                    <params>$['ZBX_Disk_Stat'][0]['write_complete']</params>
                                 </step>
                                 <step>
                                     <type>10</type>
@@ -620,7 +620,7 @@ This is the total number of sectors written successfully divided by total second
                             <preprocessing>
                                 <step>
                                     <type>12</type>
-                                    <params>$.Write_sector</params>
+                                    <params>$['ZBX_Disk_Stat'][0]['write_sector']</params>
                                 </step>
                                 <step>
                                     <type>10</type>
@@ -674,7 +674,7 @@ This is the total number of milliseconds spent by all writes (as measured from _
                             <preprocessing>
                                 <step>
                                     <type>12</type>
-                                    <params>$.Write_time</params>
+                                    <params>$['ZBX_Disk_Stat'][0]['write_time']</params>
                                 </step>
                                 <step>
                                     <type>9</type>
@@ -690,7 +690,7 @@ This is the total number of milliseconds spent by all writes (as measured from _
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{io_block_dev:custom.blkdev.read_io_time[{#DEVBLK}].min(5m)}&gt;30</expression>
+                            <expression>{io_block_dev:custom.blkdev.read_io_time[{#DEVBLK}].min(15m)}&gt;30</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Read_IO_time on {#DEVBLK} is critically big</name>
@@ -710,7 +710,7 @@ Not use this metric for Backup Disk</description>
                             <tags/>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{io_block_dev:custom.blkdev.write_io_time[{#DEVBLK}].min(5m)}&gt;30</expression>
+                            <expression>{io_block_dev:custom.blkdev.write_io_time[{#DEVBLK}].min(15m)}&gt;30</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
                             <name>Write_IO_time on {#DEVBLK} is critically big</name>
