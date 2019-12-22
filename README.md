@@ -28,7 +28,7 @@ mkdir -p /etc/zabbix-agent.d/ && cd /etc/zabbix-agent.d/
 # For RHEL/CentOS-8, Debian-10(buster), Ubuntu-18.04(Xenial), Gentoo
 curl -O 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/config_zabbix-agent/Disk_Stat.conf'
 # For old system
-curl -O 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/config_zabbix-agent/Disk_Stat_awk.conf'
+curl -o Disk_Stat.conf 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/config_zabbix-agent/Disk_Stat_awk.conf'
 
 
 #### restart zabbix-agent
