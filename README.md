@@ -23,7 +23,11 @@ echo "Include=/etc/zabbix-agent.d/*.conf" >> /etc/zabbix/zabbix_agentd.conf
 
 #### copy config 
 mkdir -p /etc/zabbix-agent.d/ && cd /etc/zabbix-agent.d/
+
+# For RHEL/CentOS-8, Debian-10(buster), Ubuntu-18.04(Xenial), Gentoo
 curl -O 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/config_zabbix-agent/Disk_Stat.conf'
+# For old system
+curl -O 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/config_zabbix-agent/Disk_Stat_awk.conf'
 
 
 #### restart zabbix-agent
@@ -43,6 +47,7 @@ systemctl restart zabbix-agent
      * ^xvd[a-z]*[0-9]+$ - result FALSE - filter partitions
      * ^[hs]d[a-z]*[0-9]+$ - result FALSE - filter partitions
      * ^loop[0-9]*$ - result FALSE - filter loop device
+     * ^sr[0-9]*$ - result FALSE - filter CD-ROM
   4. Add host to group "Disk_Stat: io_block_dev"
   5. Wait before Zabbix Discovery and Get Some Data
 
@@ -56,6 +61,8 @@ Graph create by [Grafana](https://grafana.com/) and [Zabbix plugin](https://graf
 
 # Files
   * config_zabbix-agent - config for zabbix Agent
+    * Disk_Stat.conf - default config
+    * Disk_Stat_awk.conf - for backward compatibility with old Distros(with linux-utils version < [2.30](https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.30/v2.30-ReleaseNotes))
   * Template_ZBX - Zabbix Template
   * Develop - information for Developers
   * README.md - information for Users

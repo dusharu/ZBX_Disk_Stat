@@ -77,7 +77,7 @@ DISK="$1"; if [[ ! -b "/dev/$DISK" ]]; then DISK="$( ls -l /dev/mapper/ |awk "/ 
 
 
 # cmd_5
-DISK="vg00-lv_test";
+DISK="sda";
 if [[ ! -b "/dev/$DISK" ]]; then
   DISK="$( ls -l /dev/mapper/ |awk "/ $DISK / {gsub(\"../\",\"\",\$11);
   print \$11}" )";
@@ -85,29 +85,25 @@ fi;
 if [[ "$DISK" != "" ]]; then
   grep -m1 " $DISK " /proc/diskstats |\
     awk '
-      BEGIN { printf("{"); }
+      BEGIN { printf("{\n\"ZBX_Disk_Stat\": [ {"); }
       {
-        printf("\n\t\"Name\":\"" $3 "\",");
-        printf("\n\t\"Read_Operation\":" $4 ",");
-        printf("\n\t\"Read_merge\":" $5 ",");
-        printf("\n\t\"Read_sector\":" $6 ",");
-        printf("\n\t\"Read_time\":" $7 ",");
-        printf("\n\t\"Write_Operation\":" $8 ",");
-        printf("\n\t\"Write_merge\":" $9 ",");
-        printf("\n\t\"Write_sector\":" $10 ",");
-        printf("\n\t\"Write_time\":" $11 ",");
-        printf("\n\t\"IO_Queue\":" $12 ",");
-        printf("\n\t\"IO_time\":" $13 ",");
-        printf("\n\t\"IO_time_weight\":" $14 "");
+        printf("\n\t\"name\": \"" $3 "\",");
+        printf("\n\t\"read_complete\": \"" $4 "\",");
+        printf("\n\t\"read_sector\": \"" $6 "\",");
+        printf("\n\t\"read_time\": \"" $7 "\",");
+        printf("\n\t\"write_complete\": \"" $8 "\",");
+        printf("\n\t\"write_sector\": \"" $10 "\",");
+        printf("\n\t\"write_time\": \"" $11 "\",");
+        printf("\n\t\"io_queue\": \"" $12 "\"");
       }
-      END { printf("\n}\n"); }
-    '
+      END { printf("\n\t} ]\n}"); }
+    ';
 else
   exit 100;
-fi
+fi | jq .
 
 # one_line_5
-UserParameter=custom.blkdev.all_stat[*],DISK="$1"; if [[ ! -b "/dev/$DISK" ]]; then DISK="$( ls -l /dev/mapper/ |awk "/ $DISK / {gsub(\"../\",\"\",\$$11);print \$$11}" )"; fi; if [[ "$DISK" != "" ]]; then grep -m1 " $DISK " /proc/diskstats |awk 'BEGIN { printf("{"); }   {printf("\n\t\"Name\":\"" $$3 "\","); printf("\n\t\"Read_Operation\":" $$4 ","); printf("\n\t\"Read_merge\":" $$5 ","); printf("\n\t\"Read_sector\":" $$6 ","); printf("\n\t\"Read_time\":" $$7 ","); printf("\n\t\"Write_Operation\":" $$8 ","); printf("\n\t\"Write_merge\":" $$9 ","); printf("\n\t\"Write_sector\":" $$10 ","); printf("\n\t\"Write_time\":" $$11 ","); printf("\n\t\"IO_Queue\":" $$12 ","); printf("\n\t\"IO_time\":" $$13 ","); printf("\n\t\"IO_time_weight\":" $$14 ""); }    END { printf("\n}\n"); }'; else exit 100; fi
+UserParameter=custom.blkdev.all_stat[*],DISK="$1"; if [[ ! -b "/dev/$DISK" ]]; then DISK="$( ls -l /dev/mapper/ |awk "/ $DISK / {gsub(\"../\",\"\",\$$11); print \$$11}" )"; fi; if [[ "$DISK" != "" ]]; then grep -m1 " $DISK " /proc/diskstats | awk ' BEGIN { printf("{\n\"ZBX_Disk_Stat\": [ {"); }   { printf("\n\t\"name\": \"" $$3 "\","); printf("\n\t\"read_complete\": \"" $$4 "\","); printf("\n\t\"read_sector\": \"" $$6 "\","); printf("\n\t\"read_time\": \"" $$7 "\","); printf("\n\t\"write_complete\": \"" $$8 "\","); printf("\n\t\"write_sector\": \"" $$10 "\","); printf("\n\t\"write_time\": \"" $$11 "\","); printf("\n\t\"io_queue\": \"" $$12 "\""); }     END { printf("\n\t} ]\n}"); }'; else exit 100; fi 
 
 
 
