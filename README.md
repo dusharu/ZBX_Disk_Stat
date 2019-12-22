@@ -10,8 +10,9 @@ This is small project for my Home server
   * Calculate Time for 1 Read\Write Operations
     * Trigger when IO_Time >30ms at last 5min
   * Collect IO Queue
-  * Convert DM(Device Mapper) device to Human Name
-    * dm-1 -> vg00-lv_root
+  * Convert DM(Device Mapper) device to pretty Name
+    * Get stat for `dm-1` but print for user `vg00-lv_root`
+    * After reboot `dm-1` may change to `dm-2`, but stat will be correct
 
 # Install
   1. Add parametrs to zabbix-agent.conf
@@ -40,7 +41,7 @@ systemctl restart zabbix-agent
 ```
   2. [Import](https://www.zabbix.com/documentation/3.4/manual/xml_export_import/templates) [Template_ZBX/ZBX_Disk_Stat.xml](Template_ZBX/ZBX_Disk_Stat.xml)
   3. Create [global regexp](https://www.zabbix.com/documentation/3.4/manual/regular_expressions): block_dev_filter
-     * ^$ - result FALSE - device was remove while 
+     * ^$ - result FALSE - device was remove
      * .*snapshot.* - result FALSE - filter LVM snapshot
      * -real$ - result FALSE - [filter LVM snapshot](https://rwmj.wordpress.com/2010/09/28/how-lvm-does-snapshots/)
      * -cow$ - result FALSE - [filter LVM snapshot](https://rwmj.wordpress.com/2010/09/28/how-lvm-does-snapshots/)
@@ -76,7 +77,7 @@ zabbix_get -s <IP|Server_Name> -k custom.blkdev.discovery |jq .
 ```
 ## Get statistic
 ```
-zabbix_get -s 192.168.1.200 -k custom.blkdev.all_stat[vg00-lv_root] | jq .
+zabbix_get -s <IP|Server_Name> -k custom.blkdev.all_stat[vg00-lv_root] | jq .
 ```
 # Docs
   1. [kernel.org: Describe /proc/diskstats](https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats)
