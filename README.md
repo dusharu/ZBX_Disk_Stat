@@ -60,6 +60,12 @@ Graph create by [Grafana](https://grafana.com/) and [Zabbix plugin](https://graf
 ![3-Disk_Stat_IO_time.png](/Screenshoots/3-Disk_Stat_IO_time.png)
 ![4-Disk_Stat_IO_Queue.png](/Screenshoots/4-Disk_Stat_IO_Queue.png)
 
+Graph create by Zabbix
+![10-Disk_Stat_IOPS_zbx.png](/Screenshoots/10-Disk_Stat_IOPS_zbx.png)
+![11-Disk_Stat_IO_Queue_zbx.png](/Screenshoots/11-Disk_Stat_IO_Queue_zbx.png)
+![12-Disk_Stat_RW_Sectors_zbx.png](/Screenshoots/12-Disk_Stat_RW_Sectors_zbx.png)
+
+
 # Files
   * config_zabbix-agent - config for zabbix Agent
     * Disk_Stat.conf - default config
