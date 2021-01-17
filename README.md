@@ -25,9 +25,9 @@ echo "Include=/etc/zabbix-agent.d/*.conf" >> /etc/zabbix/zabbix_agentd.conf
 #### copy config 
 mkdir -p /etc/zabbix-agent.d/ && cd /etc/zabbix-agent.d/
 
-# For RHEL/CentOS-8, Debian-10(buster), Ubuntu-18.04(Xenial), Gentoo
+# For RHEL/CentOS-8, Ubuntu-18.04(Xenial), Gentoo
 curl -O 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/config_zabbix-agent/Disk_Stat.conf'
-# For old system
+# For old system and Debian
 curl -o Disk_Stat.conf 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/config_zabbix-agent/Disk_Stat_awk.conf'
 
 
