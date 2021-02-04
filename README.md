@@ -14,6 +14,9 @@ This is small project for my Home server
     * Get stat for `dm-1` but print for user `vg00-lv_root`
     * After reboot `dm-1` may change to `dm-2`, but stat will be correct
 
+# Requires
+  * Not work with Zabbix_agent2
+
 # Install
   1. Add parametrs to zabbix-agent.conf
 
@@ -93,3 +96,4 @@ zabbix_get -s <IP|Server_Name> -k custom.blkdev.all_stat[vg00-lv_root] | jq .
 
 # ToDo
   1. Add link with information about maximum IO_time
+  2. Add plugin for zabbix_agent2
