@@ -1,5 +1,5 @@
 # ZBX_Disk_Stat
-Send statistic from /proc/diskstats to Zabbix without any additional package and program
+Send statistic from /proc/diskstats to Zabbix
 
 This is small project for my Home server
 
@@ -8,7 +8,7 @@ This is small project for my Home server
   * Collect Read\Write Operations per second
   * Collect Read\Write Sectors per second
   * Calculate Time for 1 Read\Write Operations
-    * Trigger when IO_Time >30ms at last 5min
+    * Trigger when IO_Time >30ms at 10 times per 20min
   * Collect IO Queue
   * Convert DM(Device Mapper) device to pretty Name
     * Get stat for `dm-1` but print for user `vg00-lv_root`
@@ -57,6 +57,7 @@ Graph create by Zabbix
 
 # Files
   * Template_ZBX - Zabbix Template
+  * scripts - Scripts for Zabbix Agent
   * README.md - information for Users
   * Screenshoots - Screensoot for README.md
   * LICENSE - license file
