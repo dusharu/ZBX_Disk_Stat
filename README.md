@@ -4,7 +4,7 @@ Send statistic from /proc/diskstats to Zabbix without any additional package and
 This is small project for my Home server
 
 # Features
-  * AutoDiscovery BlockDev and Filter by [global regexp](https://www.zabbix.com/documentation/3.4/manual/regular_expressions): block_dev_filter 
+  * AutoDiscovery BlockDev and Filter by [LLD Override](https://www.zabbix.com/documentation/current/manual/discovery/low_level_discovery#override) 
   * Collect Read\Write Operations per second
   * Collect Read\Write Sectors per second
   * Calculate Time for 1 Read\Write Operations
@@ -18,31 +18,17 @@ This is small project for my Home server
   * Not work with Zabbix_agent2
 
 # Install
-  1. Add parametrs to zabbix-agent.conf
+  1. Add script to server
 
 ```
-#### enable Include in config
-# /etc/zabbix/zabbix_agentd.conf
-echo "Include=/etc/zabbix-agent.d/*.conf" >> /etc/zabbix/zabbix_agentd.conf
+# Create dir for zabbix sript
+mkdir -p /usr/libexec/zabbix/
 
-#### copy config 
-mkdir -p /etc/zabbix-agent.d/ && cd /etc/zabbix-agent.d/
-
-# For RHEL-8/CentOS-8, Ubuntu-18.04(Xenial), Gentoo
-curl -O 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/config_zabbix-agent/Disk_Stat.conf'
-# For old system and Debian
-curl -o Disk_Stat.conf 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/config_zabbix-agent/Disk_Stat_awk.conf'
-
-
-#### restart zabbix-agent
-# RHEL/CentOS
-systemctl restart zabbix-agentd
-# Debian/Ubuntu
-systemctl restart zabbix-agent
-# Gentoo
-/etc/init.d/zabbix-agentd restart
+# Copy script to your server
+curl 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/scripts/disk_stat.sh' -o /usr/libexec/zabbix/disk_stat.sh
+chmod 755 /usr/libexec/zabbix/disk_stat.sh
 ```
-  2. [Import](https://www.zabbix.com/documentation/3.4/manual/xml_export_import/templates) [Template_ZBX/ZBX_Disk_Stat.xml](Template_ZBX/ZBX_Disk_Stat.xml)
+  2. [Import](https://www.zabbix.com/documentation/current/ru/manual/xml_export_import) [Template_ZBX/ZBX_Disk_Stat.xml](Template_ZBX/ZBX_Disk_Stat.xml)
   3. Check [LLD Override](https://www.zabbix.com/documentation/current/manual/discovery/low_level_discovery#override). Default value:
      * ^$ - result FALSE - device was remove
      * .*snapshot.* - result FALSE - filter LVM snapshot
@@ -70,29 +56,31 @@ Graph create by Zabbix
 
 
 # Files
-  * config_zabbix-agent - config for zabbix Agent
-    * Disk_Stat.conf - default config
-    * Disk_Stat_awk.conf - for backward compatibility with old Distros(with linux-utils version < [2.30](https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.30/v2.30-ReleaseNotes))
   * Template_ZBX - Zabbix Template
-  * Develop - information for Developers
   * README.md - information for Users
   * Screenshoots - Screensoot for README.md
   * LICENSE - license file
 
 # Debug Command
-## Test Discovery
+## Print HELP
 ```
-zabbix_get -s <IP|Server_Name> -k custom.blkdev.discovery |jq .
+zabbix_get -s <HOST> -k 'system.run[ "/usr/libexec/zabbix/disk_stat.sh" ]'
+```
+## Discovery
+```
+zabbix_get -s <HOST> -k 'system.run[ "/usr/libexec/zabbix/disk_stat.sh blkdev_discovery" ]'
 ```
 ## Get statistic
 ```
-zabbix_get -s <IP|Server_Name> -k custom.blkdev.all_stat[vg00-lv_root] | jq .
+zabbix_get -s <HOST> -k 'system.run[ "/usr/libexec/zabbix/disk_stat.sh blkdev_all_stat <DISK>" ]'
 ```
+
 # Docs
   1. [kernel.org: Describe /proc/diskstats](https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats)
   2. [kernel.org: I/O statistics fields](https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst)
   3. [Wikipedia.org: maximum IOPS on different Disk](https://en.wikipedia.org/wiki/IOPS)
   4. [RAID calcuator](https://wintelguy.com/raidperf.pl)
+  5. [Linux Filesystem Hierarchy Standard: /usr/libexec](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s07.html)
 
 # ToDo
   1. Add link with information about maximum IO_time
