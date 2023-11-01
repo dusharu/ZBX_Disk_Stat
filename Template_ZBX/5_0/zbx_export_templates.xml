@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2023-11-01T16:45:48Z</date>
+    <groups>
+        <group>
+            <name>io_block_dev</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>io_block_dev</template>
+            <name>Disk_Stat</name>
+            <description>Parse /proc/diskstats&#13;
+https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats</description>
+            <groups>
+                <group>
+                    <name>io_block_dev</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>io_block_dev</name>
+                </application>
+            </applications>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>get_block_dev</name>
+                    <key>system.run[/usr/libexec/zabbix/disk_stat.sh blkdev_discovery]</key>
+                    <delay>300s</delay>
+                    <filter>
+                        <evaltype>AND</evaltype>
+                        <conditions>
+                            <condition>
+                                <macro>{#DEVBLK}</macro>
+                                <value>.*</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <description>Discovery block dev from /proc/diskstats.&#13;
+DM(Device Mapper) device transform from dm-XX to link name in /dev/mapper/</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>IO_queue on $1</name>
+                            <type>DEPENDENT</type>
+                            <key>custom.blkdev.io_queue[{#DEVBLK}]</key>
+                            <delay>0</delay>
+                            <history>30d</history>
+                            <description>https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst&#13;
+I/Os currently in progress&#13;
+The only field that should go to zero. Incremented as requests are given to appropriate struct request_queue and decremented as they finish.</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['ZBX_Disk_Stat'][0]['io_queue']</params>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>system.run[/usr/libexec/zabbix/disk_stat.sh blkdev_all_stat {#DEVBLK}]</key>
+                            </master_item>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Read_IO_time on $1</name>
+                            <type>CALCULATED</type>
+                            <key>custom.blkdev.read_io_time[{#DEVBLK}]</key>
+                            <delay>60s</delay>
+                            <history>30d</history>
+                            <value_type>FLOAT</value_type>
+                            <units>ms</units>
+                            <params>last(&quot;custom.blkdev.read_sum_time_pm[{#DEVBLK}]&quot;)/&#13;
+(last(&quot;custom.blkdev.read_operation_pm[{#DEVBLK}]&quot;)+count(&quot;custom.blkdev.read_operation_pm[{#DEVBLK}]&quot;,#1,0,eq))</params>
+                            <description>Time for one Read Operation</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <request_method>POST</request_method>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{count(#10,30,ge)}&gt;5</expression>
+                                    <name>Read_IO_time on {#DEVBLK} is critically big</name>
+                                    <priority>AVERAGE</priority>
+                                    <description>&lt;10ms - Awesome&#13;
+10ms-30ms - OK&#13;
+&gt;30ms - BAD for typical Disk usage&#13;
+&#13;
+Not use this metric for Backup Disk</description>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Read_operation_per_min on $1</name>
+                            <type>DEPENDENT</type>
+                            <key>custom.blkdev.read_operation_pm[{#DEVBLK}]</key>
+                            <delay>0</delay>
+                            <history>30d</history>
+                            <description>https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst&#13;
+&#13;
+This is the total number of reads completed successfully.</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['ZBX_Disk_Stat'][0]['read_complete']</params>
+                                </step>
+                                <step>
+                                    <type>SIMPLE_CHANGE</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>system.run[/usr/libexec/zabbix/disk_stat.sh blkdev_all_stat {#DEVBLK}]</key>
+                            </master_item>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Read_operation_per_sec on $1</name>
+                            <type>DEPENDENT</type>
+                            <key>custom.blkdev.read_operation_ps[{#DEVBLK}]</key>
+                            <delay>0</delay>
+                            <history>30d</history>
+                            <value_type>FLOAT</value_type>
+                            <description>https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst&#13;
+&#13;
+This is the total number of reads completed successfully divided by total second.</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['ZBX_Disk_Stat'][0]['read_complete']</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>system.run[/usr/libexec/zabbix/disk_stat.sh blkdev_all_stat {#DEVBLK}]</key>
+                            </master_item>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Read_sectors_per_sec on $1</name>
+                            <type>DEPENDENT</type>
+                            <key>custom.blkdev.read_sectors_ps[{#DEVBLK}]</key>
+                            <delay>0</delay>
+                            <history>30d</history>
+                            <value_type>FLOAT</value_type>
+                            <description>https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst&#13;
+&#13;
+This is the total number of sectors read successfully  divided by total second.</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['ZBX_Disk_Stat'][0]['read_sector']</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>system.run[/usr/libexec/zabbix/disk_stat.sh blkdev_all_stat {#DEVBLK}]</key>
+                            </master_item>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>The total number of milliseconds spent by all reads on $1</name>
+                            <type>DEPENDENT</type>
+                            <key>custom.blkdev.read_sum_time_pm[{#DEVBLK}]</key>
+                            <delay>0</delay>
+                            <history>30d</history>
+                            <description>https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst&#13;
+&#13;
+This is the total number of milliseconds spent by all reads (as measured from __make_request() to end_that_request_last()).</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['ZBX_Disk_Stat'][0]['read_time']</params>
+                                </step>
+                                <step>
+                                    <type>SIMPLE_CHANGE</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>system.run[/usr/libexec/zabbix/disk_stat.sh blkdev_all_stat {#DEVBLK}]</key>
+                            </master_item>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Write_IO_time on $1</name>
+                            <type>CALCULATED</type>
+                            <key>custom.blkdev.write_io_time[{#DEVBLK}]</key>
+                            <delay>60s</delay>
+                            <history>30d</history>
+                            <value_type>FLOAT</value_type>
+                            <units>ms</units>
+                            <params>last(&quot;custom.blkdev.write_sum_time_pm[{#DEVBLK}]&quot;)/&#13;
+(last(&quot;custom.blkdev.write_operation_pm[{#DEVBLK}]&quot;)+count(&quot;custom.blkdev.write_operation_pm[{#DEVBLK}]&quot;,#1,0,eq))</params>
+                            <description>Time for one Write Operation.</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <request_method>POST</request_method>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{count(#10,30,ge)}&gt;5</expression>
+                                    <name>Write_IO_time on {#DEVBLK} is critically big</name>
+                                    <priority>AVERAGE</priority>
+                                    <description>&lt;10ms - Awesome&#13;
+10ms-30ms - OK&#13;
+&gt;30ms - BAD for typical Disk usage&#13;
+&#13;
+Not use this metric for Backup Disk</description>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Write_operation_per_min on $1</name>
+                            <type>DEPENDENT</type>
+                            <key>custom.blkdev.write_operation_pm[{#DEVBLK}]</key>
+                            <delay>0</delay>
+                            <history>30d</history>
+                            <description>https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst&#13;
+This is the total number of writes completed successfully.</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['ZBX_Disk_Stat'][0]['write_complete']</params>
+                                </step>
+                                <step>
+                                    <type>SIMPLE_CHANGE</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>system.run[/usr/libexec/zabbix/disk_stat.sh blkdev_all_stat {#DEVBLK}]</key>
+                            </master_item>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Write_operation_per_sec on $1</name>
+                            <type>DEPENDENT</type>
+                            <key>custom.blkdev.write_operation_ps[{#DEVBLK}]</key>
+                            <delay>0</delay>
+                            <history>30d</history>
+                            <value_type>FLOAT</value_type>
+                            <description>https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst&#13;
+This is the total number of writes completed successfully divided by total second.</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['ZBX_Disk_Stat'][0]['write_complete']</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>system.run[/usr/libexec/zabbix/disk_stat.sh blkdev_all_stat {#DEVBLK}]</key>
+                            </master_item>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Write_sectors_per_sec on $1</name>
+                            <type>DEPENDENT</type>
+                            <key>custom.blkdev.write_sectors_ps[{#DEVBLK}]</key>
+                            <delay>0</delay>
+                            <history>30d</history>
+                            <value_type>FLOAT</value_type>
+                            <description>https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst&#13;
+This is the total number of sectors written successfully divided by total second.</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['ZBX_Disk_Stat'][0]['write_sector']</params>
+                                </step>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>system.run[/usr/libexec/zabbix/disk_stat.sh blkdev_all_stat {#DEVBLK}]</key>
+                            </master_item>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>The total number of milliseconds spent by all writes on $1</name>
+                            <type>DEPENDENT</type>
+                            <key>custom.blkdev.write_sum_time_pm[{#DEVBLK}]</key>
+                            <delay>0</delay>
+                            <history>30d</history>
+                            <description>https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst&#13;
+This is the total number of milliseconds spent by all writes (as measured from __make_request() to end_that_request_last()).</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$['ZBX_Disk_Stat'][0]['write_time']</params>
+                                </step>
+                                <step>
+                                    <type>SIMPLE_CHANGE</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>system.run[/usr/libexec/zabbix/disk_stat.sh blkdev_all_stat {#DEVBLK}]</key>
+                            </master_item>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>All_stat on $1</name>
+                            <key>system.run[/usr/libexec/zabbix/disk_stat.sh blkdev_all_stat {#DEVBLK}]</key>
+                            <delay>60s</delay>
+                            <history>0</history>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <description>JSON raw data&#13;
+Describe in https://www.kernel.org/doc/Documentation/admin-guide/iostats.rst</description>
+                            <applications>
+                                <application>
+                                    <name>io_block_dev</name>
+                                </application>
+                            </applications>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>IOPS on {#DEVBLK}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>000066</color>
+                                    <item>
+                                        <host>io_block_dev</host>
+                                        <key>custom.blkdev.read_operation_ps[{#DEVBLK}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>3333FF</color>
+                                    <item>
+                                        <host>io_block_dev</host>
+                                        <key>custom.blkdev.write_operation_ps[{#DEVBLK}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>1A7C11</color>
+                                    <yaxisside>RIGHT</yaxisside>
+                                    <item>
+                                        <host>io_block_dev</host>
+                                        <key>custom.blkdev.read_io_time[{#DEVBLK}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <color>66FF66</color>
+                                    <yaxisside>RIGHT</yaxisside>
+                                    <item>
+                                        <host>io_block_dev</host>
+                                        <key>custom.blkdev.write_io_time[{#DEVBLK}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>IO_queue on {#DEVBLK}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>000066</color>
+                                    <item>
+                                        <host>io_block_dev</host>
+                                        <key>custom.blkdev.io_queue[{#DEVBLK}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <yaxisside>RIGHT</yaxisside>
+                                    <item>
+                                        <host>io_block_dev</host>
+                                        <key>custom.blkdev.read_io_time[{#DEVBLK}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>66FF66</color>
+                                    <yaxisside>RIGHT</yaxisside>
+                                    <item>
+                                        <host>io_block_dev</host>
+                                        <key>custom.blkdev.write_io_time[{#DEVBLK}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>Read\Write sectors(512bytes) on {#DEVBLK}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>000066</color>
+                                    <item>
+                                        <host>io_block_dev</host>
+                                        <key>custom.blkdev.read_sectors_ps[{#DEVBLK}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>3333FF</color>
+                                    <item>
+                                        <host>io_block_dev</host>
+                                        <key>custom.blkdev.write_sectors_ps[{#DEVBLK}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>1A7C11</color>
+                                    <yaxisside>RIGHT</yaxisside>
+                                    <item>
+                                        <host>io_block_dev</host>
+                                        <key>custom.blkdev.read_io_time[{#DEVBLK}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <color>66FF66</color>
+                                    <yaxisside>RIGHT</yaxisside>
+                                    <item>
+                                        <host>io_block_dev</host>
+                                        <key>custom.blkdev.write_io_time[{#DEVBLK}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                    <request_method>POST</request_method>
+                    <overrides>
+                        <override>
+                            <name>SKIP DISK</name>
+                            <step>1</step>
+                            <stop>STOP</stop>
+                            <filter>
+                                <conditions>
+                                    <condition>
+                                        <macro>{#DEVBLK}</macro>
+                                        <value>^sr[0-9]*$</value>
+                                        <formulaid>A</formulaid>
+                                    </condition>
+                                    <condition>
+                                        <macro>{#DEVBLK}</macro>
+                                        <value>-cow$</value>
+                                        <formulaid>B</formulaid>
+                                    </condition>
+                                    <condition>
+                                        <macro>{#DEVBLK}</macro>
+                                        <value>^$</value>
+                                        <formulaid>C</formulaid>
+                                    </condition>
+                                    <condition>
+                                        <macro>{#DEVBLK}</macro>
+                                        <value>.*snapshot.*</value>
+                                        <formulaid>D</formulaid>
+                                    </condition>
+                                    <condition>
+                                        <macro>{#DEVBLK}</macro>
+                                        <value>-real$</value>
+                                        <formulaid>E</formulaid>
+                                    </condition>
+                                    <condition>
+                                        <macro>{#DEVBLK}</macro>
+                                        <value>^xvd[a-z]*[0-9]+$</value>
+                                        <formulaid>F</formulaid>
+                                    </condition>
+                                    <condition>
+                                        <macro>{#DEVBLK}</macro>
+                                        <value>^[hs]d[a-z]*[0-9]+$</value>
+                                        <formulaid>G</formulaid>
+                                    </condition>
+                                    <condition>
+                                        <macro>{#DEVBLK}</macro>
+                                        <value>^loop[0-9]*$</value>
+                                        <formulaid>H</formulaid>
+                                    </condition>
+                                </conditions>
+                            </filter>
+                            <operations>
+                                <operation>
+                                    <operationobject>ITEM_PROTOTYPE</operationobject>
+                                    <operator>REGEXP</operator>
+                                    <value>.*</value>
+                                    <discover>NO_DISCOVER</discover>
+                                </operation>
+                                <operation>
+                                    <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                                    <operator>REGEXP</operator>
+                                    <value>.*</value>
+                                    <discover>NO_DISCOVER</discover>
+                                </operation>
+                                <operation>
+                                    <operationobject>GRAPH_PROTOTYPE</operationobject>
+                                    <operator>REGEXP</operator>
+                                    <value>.*</value>
+                                    <discover>NO_DISCOVER</discover>
+                                </operation>
+                            </operations>
+                        </override>
+                    </overrides>
+                </discovery_rule>
+            </discovery_rules>
+        </template>
+    </templates>
+</zabbix_export>

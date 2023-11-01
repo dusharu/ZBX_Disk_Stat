@@ -28,7 +28,7 @@ mkdir -p /usr/libexec/zabbix/
 curl 'https://raw.githubusercontent.com/dusharu/ZBX_Disk_Stat/master/scripts/disk_stat.sh' -o /usr/libexec/zabbix/disk_stat.sh
 chmod 755 /usr/libexec/zabbix/disk_stat.sh
 ```
-  2. [Import](https://www.zabbix.com/documentation/current/ru/manual/xml_export_import) [Template_ZBX/ZBX_Disk_Stat.xml](Template_ZBX/ZBX_Disk_Stat.xml)
+  2. [Import](https://www.zabbix.com/documentation/current/ru/manual/xml_export_import) [Template_ZBX/latest/ZBX_Disk_Stat.xml](Template_ZBX/latest/ZBX_Disk_Stat.xml)
   3. Check [LLD Override](https://www.zabbix.com/documentation/current/manual/discovery/low_level_discovery#override). Default value:
      * ^$ - result FALSE - device was remove
      * .*snapshot.* - result FALSE - filter LVM snapshot
