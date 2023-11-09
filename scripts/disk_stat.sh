@@ -13,8 +13,6 @@ EXIT_CODE_INVALID_INPUT_PARAMETRS=200
 EXIT_CODE_INVALID_DISK=201
 EXIT_CODE_DISK_NOT_FOUND=220 # used in functions blkdev_all_stat*
 
-
-
 #################### Function
 #######################################
 # Print Help
@@ -23,7 +21,7 @@ EXIT_CODE_DISK_NOT_FOUND=220 # used in functions blkdev_all_stat*
 # Arguments:
 #   None
 #######################################
-function PrintHelp {
+function PrintHelp() {
   echo "PRINT HELP:"
   echo "$0 blkdev_discovery # return json with list of block devices"
   echo "$0 blkdev_all_stat <sdX|vg/lv> # return json with statistic for /dev/sdX or LVM device(dev/vgX/lvX)"
@@ -32,8 +30,6 @@ function PrintHelp {
   echo "https://github.com/dusharu/ZBX_Disk_Stat"
 }
 
-
-
 #######################################
 # Discovery block devices
 # Globals:
@@ -41,7 +37,7 @@ function PrintHelp {
 # Arguments:
 #   None
 #######################################
-function blkdev_discovery {
+function blkdev_discovery() {
   # json header
   echo -n -e "{\n\t\"data\":["
 
@@ -58,7 +54,7 @@ function blkdev_discovery {
 
     # print comma(,) for pervious line
     ((++i))
-    if [[ "$i" -gt 1 ]]; then 
+    if [[ "$i" -gt 1 ]]; then
       echo -n -e "\t},"
     fi
 
@@ -67,23 +63,22 @@ function blkdev_discovery {
 
     # print blkdev Item Name
     if [[ "$DEV" =~ ^dm-[0-9]*$ ]]; then
-      lsblk -l -o Name,KNAME |\
-         grep -m 1 "\s*${DEV}$" |\
-         cut -d " " -f 1 |\
-         tr -d '\n'
+      lsblk -l -o Name,KNAME \
+        | grep -m 1 "\s*${DEV}$" \
+        | cut -d " " -f 1 \
+        | tr -d '\n'
     else
       echo -n "$DEV"
     fi
 
     # print blkd Item finisher
     echo -n \"
-  done < /proc/diskstats
+  done </proc/diskstats
 
   # json footer
   echo -n -e "\t}\n"
   echo -n -e "\t]\n}\n"
 }
-
 
 #######################################
 # Return Disk statistics in json
@@ -92,36 +87,34 @@ function blkdev_discovery {
 # Arguments:
 #   DISK name;
 #######################################
-function blkdev_all_stat {
+function blkdev_all_stat() {
   DISK="$1"
   EXIT_CODE_DISK_NOT_FOUND=220
 
   # count parametrs and make correct fields name for column utility
   DISK_PARAMETERS_ALL='major,minor,name,read_complete,read_merge,read_sector,read_time,write_complete,write_merge,write_sector,write_time,io_queue,io_time,io_time_weight,discard_complete,discard_merge,discard_sector,discard_time,flush_request,flush_time'
   DISK_PARAMETERS_COUNT="$(awk '{print NF; exit}' /proc/diskstats)"
-  DISK_PARAMETERS="$(echo "$DISK_PARAMETERS_ALL" | cut -d , -f "1-$DISK_PARAMETERS_COUNT" )"
+  DISK_PARAMETERS="$(echo "$DISK_PARAMETERS_ALL" | cut -d , -f "1-$DISK_PARAMETERS_COUNT")"
 
   # translate blk-name to dm-XX
-  if [ ! -b "/dev/$DISK" ]; then 
-    DISK="$(lsblk -l -o KNAME,Name | grep -m 1 "$DISK" |awk '{print $1}')"
+  if [ ! -b "/dev/$DISK" ]; then
+    DISK="$(lsblk -l -o KNAME,Name | grep -m 1 "$DISK" | awk '{print $1}')"
   fi
 
   # generate json
-  if [ "$DISK" != "" ]; then 
+  if [ "$DISK" != "" ]; then
     # sed if end of cmd for Backward cmpability
     # modern version of column print table-name in lower case
-    grep -m 1 " $DISK " /proc/diskstats |\
-      column \
+    grep -m 1 " $DISK " /proc/diskstats \
+      | column \
         --json \
         --table-name ZBX_Disk_Stat \
-        --table-columns "$DISK_PARAMETERS" |\
-      sed -e 's/zbx_disk_stat/ZBX_Disk_Stat/g'
-  else 
+        --table-columns "$DISK_PARAMETERS" \
+      | sed -e 's/zbx_disk_stat/ZBX_Disk_Stat/g'
+  else
     exit "$EXIT_CODE_DISK_NOT_FOUND"
   fi
 }
-
-
 
 #######################################
 # Return Disk statistics in json without utility column
@@ -131,17 +124,17 @@ function blkdev_all_stat {
 # Arguments:
 #   DISK name;
 #######################################
-function blkdev_all_stat_without_column {
+function blkdev_all_stat_without_column() {
   DISK="$1"
   EXIT_CODE_DISK_NOT_FOUND=220
 
   # translate blk-name to dm-XX
   if [ ! -b "/dev/$DISK" ]; then
-    DISK="$(lsblk -l -o KNAME,Name | grep -m 1 "$DISK" |awk '{print $1}')"
+    DISK="$(lsblk -l -o KNAME,Name | grep -m 1 "$DISK" | awk '{print $1}')"
   fi
 
   # generate json
-  if [ "$DISK" != "" ]; then 
+  if [ "$DISK" != "" ]; then
     grep -m1 " $DISK " /proc/diskstats | awk '
       BEGIN { printf("{\n\"ZBX_Disk_Stat\": [ {"); }
       { 
@@ -160,27 +153,29 @@ function blkdev_all_stat_without_column {
   fi
 }
 
-
-
-
-
 #################### MAIN
 case "$1" in
- blkdev_discovery) blkdev_discovery ;;
- blkdev_all_stat)
-   if [[ -n "$2" ]]; then
-     COLUMN_VERSION="$(column --version|grep -oe '[0-9\.]*')"
-     if [[ "$(echo -e "2.30\n${COLUMN_VERSION}"| sort -V | head -n 1)" == 2.30 ]]; then
-       # column version >= 2.30 and has --json option
-       # https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.30/v2.30-ReleaseNotes
-       blkdev_all_stat "$2"
-     else
-       # column version < 2.30 and doesn't have --json option
-       blkdev_all_stat_without_column "$2"
-     fi
-   else
-     echo "ERROR Unknow DISK: $2"; PrintHelp; exit "$EXIT_CODE_INVALID_DISK"
-   fi
- ;;
- *) echo "ERROR Unknow action: $1"; PrintHelp; exit "$EXIT_CODE_INVALID_INPUT_PARAMETRS" ;;
+  blkdev_discovery) blkdev_discovery ;;
+  blkdev_all_stat)
+    if [[ -n "$2" ]]; then
+      COLUMN_VERSION="$(column --version 2>/dev/null | grep -oe '[0-9\.]*')"
+      if [[ "$(echo -e "2.30\n${COLUMN_VERSION}" | sort -V | head -n 1)" == 2.30 ]]; then
+        # column version >= 2.30 and has --json option
+        # https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.30/v2.30-ReleaseNotes
+        blkdev_all_stat "$2"
+      else
+        # column version < 2.30 and doesn't have --json option
+        blkdev_all_stat_without_column "$2"
+      fi
+    else
+      echo "ERROR Unknow DISK: $2"
+      PrintHelp
+      exit "$EXIT_CODE_INVALID_DISK"
+    fi
+    ;;
+  *)
+    echo "ERROR Unknow action: $1"
+    PrintHelp
+    exit "$EXIT_CODE_INVALID_INPUT_PARAMETRS"
+    ;;
 esac
